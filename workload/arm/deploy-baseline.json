@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "9289524931138065824"
+      "templateHash": "7510546236392077065"
     },
     "name": "AVD Accelerator - Baseline Deployment",
     "description": "AVD Accelerator - Deployment Baseline"
@@ -7320,7 +7320,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "10498495663445727510"
+              "templateHash": "13955971229671112325"
             }
           },
           "parameters": {
@@ -9422,7 +9422,7 @@
                   "tags": {
                     "value": "[parameters('tags')]"
                   },
-                  "routes": "[if(and(variables('varCreateAvdStaicRoute'), not(empty(parameters('existingHubVnetFirewallIp')))), createObject('value', createArray(createObject('name', 'AVDServiceTraffic', 'properties', createObject('addressPrefix', 'WindowsVirtualDesktop', 'hasBgpOverride', true(), 'nextHopType', 'Internet')), createObject('name', 'AVDStunTurnTraffic', 'properties', createObject('addressPrefix', '20.202.0.0/16', 'hasBgpOverride', true(), 'nextHopType', 'Internet')), createObject('name', 'HubFirewallDefaultRoute', 'properties', createObject('addressPrefix', '0.0.0.0/0', 'hasBgpOverride', true(), 'nextHopType', parameters('existingHubVnetFirewallIp'))))), if(variables('varCreateAvdStaicRoute'), createObject('value', createArray(createObject('name', 'AVDServiceTraffic', 'properties', createObject('addressPrefix', 'WindowsVirtualDesktop', 'hasBgpOverride', true(), 'nextHopType', 'Internet')), createObject('name', 'AVDStunTurnTraffic', 'properties', createObject('addressPrefix', '20.202.0.0/16', 'hasBgpOverride', true(), 'nextHopType', 'Internet')))), createObject('value', createArray())))]"
+                  "routes": "[if(and(variables('varCreateAvdStaicRoute'), not(empty(parameters('existingHubVnetFirewallIp')))), createObject('value', createArray(createObject('name', 'AVDServiceTraffic', 'properties', createObject('addressPrefix', 'WindowsVirtualDesktop', 'hasBgpOverride', true(), 'nextHopType', 'Internet')), createObject('name', 'AVDStunTurnTraffic', 'properties', createObject('addressPrefix', '20.202.0.0/16', 'hasBgpOverride', true(), 'nextHopType', 'Internet')), createObject('name', 'HubFirewallDefaultRoute', 'properties', createObject('addressPrefix', '0.0.0.0/0', 'hasBgpOverride', true(), 'nextHopIpAddress', parameters('existingHubVnetFirewallIp'))))), if(variables('varCreateAvdStaicRoute'), createObject('value', createArray(createObject('name', 'AVDServiceTraffic', 'properties', createObject('addressPrefix', 'WindowsVirtualDesktop', 'hasBgpOverride', true(), 'nextHopType', 'Internet')), createObject('name', 'AVDStunTurnTraffic', 'properties', createObject('addressPrefix', '20.202.0.0/16', 'hasBgpOverride', true(), 'nextHopType', 'Internet')))), createObject('value', createArray())))]"
                 },
                 "template": {
                   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",

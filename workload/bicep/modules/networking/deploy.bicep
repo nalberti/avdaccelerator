@@ -288,7 +288,7 @@ module routeTableAvd '../../../../carml/1.3.0/Microsoft.Network/routeTables/depl
                 properties: {
                     addressPrefix: '0.0.0.0/0'
                     hasBgpOverride: true
-                    nextHopType: existingHubVnetFirewallIp
+                    nextHopIpAddress: existingHubVnetFirewallIp
                 }
             }
         ] : varCreateAvdStaicRoute ? [
