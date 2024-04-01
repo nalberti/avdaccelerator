@@ -45,6 +45,9 @@ param vNetworkGatewayOnHub bool
 @sys.description('Existing hub virtual network for peering.')
 param existingHubVnetResourceId string
 
+@sys.description('Existing hub virtual network NVA/Firewall IP.')
+param existingHubVnetFirewallIp string
+
 @sys.description('VNet peering name for AVD VNet to vHub.')
 param vnetPeeringName string
 
@@ -263,7 +266,7 @@ module routeTableAvd '../../../../carml/1.3.0/Microsoft.Network/routeTables/depl
         name: avdRouteTableName
         location: sessionHostLocation
         tags: tags
-        routes: varCreateAvdStaicRoute ? [
+        routes: (varCreateAvdStaicRoute && !empty(existingHubVnetFirewallIp)) ? [
             {
                 name: 'AVDServiceTraffic'
                 properties: {
@@ -280,7 +283,32 @@ module routeTableAvd '../../../../carml/1.3.0/Microsoft.Network/routeTables/depl
                     nextHopType: 'Internet'
                 }
             }
-        ] : []
+            {
+                name: 'HubFirewallDefaultRoute'
+                properties: {
+                    addressPrefix: '0.0.0.0/0'
+                    hasBgpOverride: true
+                    nextHopType: existingHubVnetFirewallIp
+                }
+            }
+        ] : varCreateAvdStaicRoute ? [
+            {
+                name: 'AVDServiceTraffic'
+                properties: {
+                    addressPrefix: 'WindowsVirtualDesktop'
+                    hasBgpOverride: true
+                    nextHopType: 'Internet'
+                }
+            }
+            {
+                name: 'AVDStunTurnTraffic'
+                properties: {
+                    addressPrefix: '20.202.0.0/16'
+                    hasBgpOverride: true
+                    nextHopType: 'Internet'
+                }
+            }
+        ]: []
     }
     dependsOn: []
 }

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "5350888940481572423"
+      "templateHash": "9289524931138065824"
     },
     "name": "AVD Accelerator - Baseline Deployment",
     "description": "AVD Accelerator - Deployment Baseline"
@@ -247,6 +247,13 @@
       "defaultValue": "",
       "metadata": {
         "description": "Existing hub virtual network for perring. (Default: \"\")"
+      }
+    },
+    "existingHubVnetFirewallIp": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Existing hub virtual network NVA/Firewall IP. (Default: \"\")"
       }
     },
     "avdVnetworkAddressPrefixes": {
@@ -7285,6 +7292,9 @@
           "existingHubVnetResourceId": {
             "value": "[parameters('existingHubVnetResourceId')]"
           },
+          "existingHubVnetFirewallIp": {
+            "value": "[parameters('existingHubVnetFirewallIp')]"
+          },
           "sessionHostLocation": {
             "value": "[parameters('avdSessionHostLocation')]"
           },
@@ -7310,7 +7320,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "14586501372774626293"
+              "templateHash": "10498495663445727510"
             }
           },
           "parameters": {
@@ -7397,6 +7407,12 @@
               "type": "string",
               "metadata": {
                 "description": "Existing hub virtual network for peering."
+              }
+            },
+            "existingHubVnetFirewallIp": {
+              "type": "string",
+              "metadata": {
+                "description": "Existing hub virtual network NVA/Firewall IP."
               }
             },
             "vnetPeeringName": {
@@ -9406,7 +9422,7 @@
                   "tags": {
                     "value": "[parameters('tags')]"
                   },
-                  "routes": "[if(variables('varCreateAvdStaicRoute'), createObject('value', createArray(createObject('name', 'AVDServiceTraffic', 'properties', createObject('addressPrefix', 'WindowsVirtualDesktop', 'hasBgpOverride', true(), 'nextHopType', 'Internet')), createObject('name', 'AVDStunTurnTraffic', 'properties', createObject('addressPrefix', '20.202.0.0/16', 'hasBgpOverride', true(), 'nextHopType', 'Internet')))), createObject('value', createArray()))]"
+                  "routes": "[if(and(variables('varCreateAvdStaicRoute'), not(empty(parameters('existingHubVnetFirewallIp')))), createObject('value', createArray(createObject('name', 'AVDServiceTraffic', 'properties', createObject('addressPrefix', 'WindowsVirtualDesktop', 'hasBgpOverride', true(), 'nextHopType', 'Internet')), createObject('name', 'AVDStunTurnTraffic', 'properties', createObject('addressPrefix', '20.202.0.0/16', 'hasBgpOverride', true(), 'nextHopType', 'Internet')), createObject('name', 'HubFirewallDefaultRoute', 'properties', createObject('addressPrefix', '0.0.0.0/0', 'hasBgpOverride', true(), 'nextHopType', parameters('existingHubVnetFirewallIp'))))), if(variables('varCreateAvdStaicRoute'), createObject('value', createArray(createObject('name', 'AVDServiceTraffic', 'properties', createObject('addressPrefix', 'WindowsVirtualDesktop', 'hasBgpOverride', true(), 'nextHopType', 'Internet')), createObject('name', 'AVDStunTurnTraffic', 'properties', createObject('addressPrefix', '20.202.0.0/16', 'hasBgpOverride', true(), 'nextHopType', 'Internet')))), createObject('value', createArray())))]"
                 },
                 "template": {
                   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",

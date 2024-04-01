@@ -129,6 +129,9 @@ param existingVnetPrivateEndpointSubnetResourceId string = ''
 @sys.description('Existing hub virtual network for perring. (Default: "")')
 param existingHubVnetResourceId string = ''
 
+@sys.description('Existing hub virtual network NVA/Firewall IP. (Default: "")')
+param existingHubVnetFirewallIp string = ''
+
 @sys.description('AVD virtual network address prefixes. (Default: 10.10.0.0/23)')
 param avdVnetworkAddressPrefixes string = '10.10.0.0/23'
 
@@ -858,6 +861,7 @@ module networking './modules/networking/deploy.bicep' = if (createAvdVnet || cre
         deployPrivateEndpointSubnet: (deployPrivateEndpointKeyvaultStorage == true) ? true : false //adding logic that will be used when also including AVD control plane PEs
         vNetworkGatewayOnHub: vNetworkGatewayOnHub
         existingHubVnetResourceId: existingHubVnetResourceId
+        existingHubVnetFirewallIp: existingHubVnetFirewallIp
         sessionHostLocation: avdSessionHostLocation
         vnetAvdSubnetAddressPrefix: vNetworkAvdSubnetAddressPrefix
         vnetPrivateEndpointSubnetAddressPrefix: vNetworkPrivateEndpointSubnetAddressPrefix
