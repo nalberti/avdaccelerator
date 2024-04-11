@@ -37,9 +37,6 @@ param diskEncryptionKeyExpirationInEpoch int
 @sys.description('Encryption set name')
 param diskEncryptionSetName string
 
-//@sys.description('Zero trust managed identity')
-//param ztManagedIdentityResourceId string
-
 @sys.description('Tags to be applied to resources')
 param tags object
 
@@ -147,7 +144,6 @@ module ztDiskEncryptionSet '../../../../../carml/1.3.0/Microsoft.Compute/diskEnc
         rotationToLatestKeyVersionEnabled: true
         systemAssignedIdentity: true
         tags: tags
-    //    userAssignedIdentities: {}
     }
 }
 
