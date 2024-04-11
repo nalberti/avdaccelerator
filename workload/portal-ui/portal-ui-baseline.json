@@ -693,7 +693,7 @@
                                 {
                                     "name": "ssessionHostEncryptionAtHostWarning",
                                     "type": "Microsoft.Common.InfoBox",
-                                    "visible": "[equals(steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost, true)]",
+                                    "visible": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost]",
                                     "options": {
                                         "text": "Encryption At Host disk encryption requires feature EncryptionAtHost of resource provider Microsoft.Compute to be registered in the subscription. The Encryption At Host feature can not be used with Azure Disk Encryption.",
                                         "uri": "https://learn.microsoft.com/azure/virtual-machines/disks-enable-host-based-encryption-portal?tabs=azure-powershell",
@@ -711,7 +711,7 @@
                                 {
                                     "name": "ssessionHostAzureDiskEncryptionWarning",
                                     "type": "Microsoft.Common.InfoBox",
-                                    "visible": "[(equals(steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption, true)]",
+                                    "visible": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption]",
                                     "options": {
                                         "text": "Azure Disk Encryption can not be used with Encryption At Host disk encryption. ",
                                         "uri": "https://learn.microsoft.com/en-us/azure/virtual-machines/windows/disk-encryption-overview",
