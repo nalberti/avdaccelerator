@@ -685,7 +685,7 @@
                                 {
                                     "name": "sessionHostEncryptionAtHost",
                                     "type": "Microsoft.Common.CheckBox",
-                                    "visible": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption]",
+                                    "visible": "[not(steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption)]",
                                     "label": "Encryption At Host",
                                     "defaultValue": false,
                                     "toolTip": "Enables Encryption At Host with Customer Managed Keys on management VM and session hosts disks"
@@ -693,7 +693,7 @@
                                 {
                                     "name": "ssessionHostEncryptionAtHostWarning",
                                     "type": "Microsoft.Common.InfoBox",
-                                    "visible": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost]",
+                                    "visible": "[(steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost)]",
                                     "options": {
                                         "text": "Encryption At Host disk encryption requires feature EncryptionAtHost of resource provider Microsoft.Compute to be registered in the subscription. The Encryption At Host feature can not be used with Azure Disk Encryption.",
                                         "uri": "https://learn.microsoft.com/azure/virtual-machines/disks-enable-host-based-encryption-portal?tabs=azure-powershell",
@@ -703,7 +703,7 @@
                                 {
                                     "name": "sessionHostAzureDiskEncryption",
                                     "type": "Microsoft.Common.CheckBox",
-                                    "visible": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost]",
+                                    "visible": "[not(steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost)]",
                                     "label": "Azure Disk Encryption",
                                     "defaultValue": false,
                                     "toolTip": "Enables Azure Disk Encryption on management VM and session hosts disks"
@@ -711,7 +711,7 @@
                                 {
                                     "name": "ssessionHostAzureDiskEncryptionWarning",
                                     "type": "Microsoft.Common.InfoBox",
-                                    "visible": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption]",
+                                    "visible": "[(steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption)]",
                                     "options": {
                                         "text": "Azure Disk Encryption can not be used with Encryption At Host disk encryption. ",
                                         "uri": "https://learn.microsoft.com/en-us/azure/virtual-machines/windows/disk-encryption-overview",
