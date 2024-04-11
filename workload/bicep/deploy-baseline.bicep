@@ -1065,7 +1065,6 @@ module wrklKeyVault '../../carml/1.3.0/Microsoft.KeyVault/vaults/deploy.bicep' =
 module managementVm './modules/storageAzureFiles/.bicep/managementVm.bicep' = if (createAvdFslogixDeployment || varCreateMsixDeployment) {
     name: 'Storage-MGMT-VM-${time}'
     params: {
-        diskEncryptionSetResourceId: encryptionAtHost ? zeroTrust.outputs.ztDiskEncryptionSetResourceId : ''
         identityServiceProvider: avdIdentityServiceProvider
         managementVmName: varManagementVmName
         computeTimeZone: varTimeZoneSessionHosts
@@ -1086,6 +1085,11 @@ module managementVm './modules/storageAzureFiles/.bicep/managementVm.bicep' = if
         vmLocalUserName: avdVmLocalUserName
         workloadSubsId: avdWorkloadSubsId
         encryptionAtHost: encryptionAtHost
+        diskEncryptionSetResourceId: encryptionAtHost ? zeroTrust.outputs.ztDiskEncryptionSetResourceId : ''
+        azureDiskEncryption: azureDiskEncryption
+        adeKeyVaultUri: azureDiskEncryption ? zeroTrust.outputs.ztKeyVaultUri : ''
+        adeKeyVaultResourceId: azureDiskEncryption ? zeroTrust.outputs.ztKeyVaultResourceId : ''
+        adeKeyVaultKeyUri: azureDiskEncryption ? zeroTrust.outputs.ztKeyVaultKeyUri : ''
         storageManagedIdentityResourceId: varCreateStorageDeployment ? identity.outputs.managedIdentityStorageResourceId : ''
         osImage: varMgmtVmSpecs.osImage
         tags: createResourceTags ? union(varCustomResourceTags, varAvdDefaultTags) : varAvdDefaultTags

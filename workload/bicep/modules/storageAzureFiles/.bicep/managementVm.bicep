@@ -7,6 +7,15 @@ targetScope = 'subscription'
 @sys.description('AVD disk encryption set resource ID to enable server side encyption.')
 param diskEncryptionSetResourceId string
 
+@sys.description('Key Vault ResourceID for Azure Disk Encryption')
+param adeKeyVaultResourceId string
+
+@sys.description('Key Vault Uri for Azure Disk Encryption')
+param adeKeyVaultUri string
+
+@sys.description('Key Vault Key Uri for Azure Disk Encryption')
+param adeKeyVaultKeyUri string
+
 @sys.description('AVD workload subscription ID, multiple subscriptions scenario.')
 param workloadSubsId string
 
@@ -39,6 +48,9 @@ param location string
 
 @sys.description('This property can be used by user in the request to enable or disable the Host Encryption for the virtual machine. This will enable the encryption for all the disks including Resource/Temp disk at host itself. For security reasons, it is recommended to set encryptionAtHost to True. Restrictions: Cannot be enabled if Azure Disk Encryption (guest-VM encryption using bitlocker/DM-Crypt) is enabled on your VMs.')
 param encryptionAtHost bool
+
+@sys.description('This property can be used by user in the request to enable or disable the Azure Disk Encryption extension for the virtual machine. This will enable the encryption for all the disks including Resource/Temp disk at host itself. For security reasons, it is recommended to set azureDiskEncryption to True. Restrictions: Cannot be enabled if EncryptionAtHost is enabled on your VMs.')
+param azureDiskEncryption bool
 
 @sys.description('Session host VM size.')
 param mgmtVmSize string
@@ -91,6 +103,17 @@ var varManagedDisk = empty(diskEncryptionSetResourceId) ? {
     }
     storageAccountType: osDiskType
 }
+
+var azureDiskEncryptionSettings = {
+    EncryptionOperation:    'EnableEncryption'
+    KeyVaultURL:            adeKeyVaultUri
+    KeyVaultResourceId:     adeKeyVaultResourceId
+    KeyEncryptionKeyURL:    adeKeyVaultKeyUri
+    KekVaultResourceId:     adeKeyVaultResourceId
+    KeyEncryptionAlgorithm: 'RSA-OAEP-256'
+    VolumeType:             'All'
+    ResizeOSDisk:           false
+  }
 
 // =========== //
 // Deployments //
@@ -173,6 +196,27 @@ module managementVm '../../../../../carml/1.3.0/Microsoft.Compute/virtualMachine
         tags: tags
     }
     dependsOn: [
+    ]
+}
+
+// Add Azure Disk Encryption extension to session host.
+module sessionHostsAzureDiskEncryption '../../../../../carml/1.3.0/Microsoft.Compute/virtualMachines/extensions/deploy.bicep' = if (azureDiskEncryption) {
+    scope: resourceGroup('${workloadSubsId}', '${serviceObjectsRgName}')
+    name: 'MGMT-VM-ADE-${time}'
+    params: {
+        virtualMachineName: managementVmName
+        name: 'AzureDiskEncryption'
+        location: location
+        publisher: 'Microsoft.Azure.Security'
+        type: 'AzureDiskEncryption'
+        typeHandlerVersion: '2.2'
+        autoUpgradeMinorVersion: true
+        forceUpdateTag: '1.0'
+        settings: azureDiskEncryptionSettings
+        enableAutomaticUpgrade: false
+        }
+    dependsOn: [
+        managementVm
     ]
 }
 
