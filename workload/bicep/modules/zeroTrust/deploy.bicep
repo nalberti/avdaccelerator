@@ -25,9 +25,6 @@ param serviceObjectsRgName string
 @sys.description('AVD Resource Group Name for the service objects.')
 param computeObjectsRgName string
 
-@sys.description('Managed identity for zero trust setup.')
-param managedIdentityName string
-
 @sys.description('This value is used to set the expiration date on the disk encryption key.')
 param diskEncryptionKeyExpirationInDays int
 
@@ -79,7 +76,6 @@ var varCustomPolicyDefinitions = [
 // =========== //
 // Deployments //
 // =========== //
-// call on the keyvault.
 
 // Policy Definition for Managed Disk Network Access.
 module ztPolicyDefinitions '../../../../carml/1.3.0/Microsoft.Authorization/policyDefinitions/subscription/deploy.bicep' = [for customPolicyDefinition in varCustomPolicyDefinitions: if (diskZeroTrust) {

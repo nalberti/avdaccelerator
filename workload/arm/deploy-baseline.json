@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "17476389693265622797"
+      "templateHash": "12032997900795201533"
     },
     "name": "AVD Accelerator - Baseline Deployment",
     "description": "AVD Accelerator - Deployment Baseline"
@@ -1326,7 +1326,6 @@
     "varManagementPlaneNamingStandard": "[format('{0}-{1}-{2}', variables('varDeploymentPrefixLowercase'), variables('varDeploymentEnvironmentLowercase'), variables('varManagementPlaneLocationAcronym'))]",
     "varComputeStorageResourcesNamingStandard": "[format('{0}-{1}-{2}', variables('varDeploymentPrefixLowercase'), variables('varDeploymentEnvironmentLowercase'), variables('varSessionHostLocationAcronym'))]",
     "varDiskEncryptionSetName": "[if(parameters('avdUseCustomNaming'), format('{0}-{1}-001', parameters('ztDiskEncryptionSetCustomNamePrefix'), variables('varComputeStorageResourcesNamingStandard')), format('des-zt-{0}-001', variables('varComputeStorageResourcesNamingStandard')))]",
-    "varZtManagedIdentityName": "[if(parameters('avdUseCustomNaming'), format('{0}-{1}-001', parameters('ztManagedIdentityCustomName'), variables('varComputeStorageResourcesNamingStandard')), format('id-zt-{0}-001', variables('varComputeStorageResourcesNamingStandard')))]",
     "varSessionHostLocationLowercase": "[toLower(replace(parameters('avdSessionHostLocation'), ' ', ''))]",
     "varManagementPlaneLocationLowercase": "[toLower(replace(parameters('avdManagementPlaneLocation'), ' ', ''))]",
     "varServiceObjectsRgName": "[if(parameters('avdUseCustomNaming'), parameters('avdServiceObjectsRgCustomName'), format('rg-avd-{0}-service-objects', variables('varManagementPlaneNamingStandard')))]",
@@ -18527,9 +18526,6 @@
           "computeObjectsRgName": {
             "value": "[variables('varComputeObjectsRgName')]"
           },
-          "managedIdentityName": {
-            "value": "[variables('varZtManagedIdentityName')]"
-          },
           "vaultSku": {
             "value": "[variables('varWrklKeyVaultSku')]"
           },
@@ -18566,7 +18562,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "2063205973724426527"
+              "templateHash": "9892697416976690295"
             }
           },
           "parameters": {
@@ -18610,12 +18606,6 @@
               "type": "string",
               "metadata": {
                 "description": "AVD Resource Group Name for the service objects."
-              }
-            },
-            "managedIdentityName": {
-              "type": "string",
-              "metadata": {
-                "description": "Managed identity for zero trust setup."
               }
             },
             "diskEncryptionKeyExpirationInDays": {

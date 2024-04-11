@@ -505,7 +505,6 @@ var varTimeZoneManagementPlane = varLocations[varManagementPlaneLocationLowercas
 var varManagementPlaneNamingStandard = '${varDeploymentPrefixLowercase}-${varDeploymentEnvironmentLowercase}-${varManagementPlaneLocationAcronym}'
 var varComputeStorageResourcesNamingStandard = '${varDeploymentPrefixLowercase}-${varDeploymentEnvironmentLowercase}-${varSessionHostLocationAcronym}'
 var varDiskEncryptionSetName = avdUseCustomNaming ? '${ztDiskEncryptionSetCustomNamePrefix}-${varComputeStorageResourcesNamingStandard}-001' : 'des-zt-${varComputeStorageResourcesNamingStandard}-001'
-var varZtManagedIdentityName = avdUseCustomNaming ? '${ztManagedIdentityCustomName}-${varComputeStorageResourcesNamingStandard}-001' : 'id-zt-${varComputeStorageResourcesNamingStandard}-001'
 var varSessionHostLocationLowercase = toLower(replace(avdSessionHostLocation, ' ', ''))
 var varManagementPlaneLocationLowercase = toLower(replace(avdManagementPlaneLocation, ' ', ''))
 var varServiceObjectsRgName = avdUseCustomNaming ? avdServiceObjectsRgCustomName : 'rg-avd-${varManagementPlaneNamingStandard}-service-objects' // max length limit 90 characters
@@ -954,7 +953,6 @@ module zeroTrust './modules/zeroTrust/deploy.bicep' = if ((diskZeroTrust || azur
         encryptionAtHost: encryptionAtHost
         serviceObjectsRgName: varServiceObjectsRgName
         computeObjectsRgName: varComputeObjectsRgName
-        managedIdentityName: varZtManagedIdentityName
         vaultSku: varWrklKeyVaultSku
         diskEncryptionKeyExpirationInDays: diskEncryptionKeyExpirationInDays
         diskEncryptionKeyExpirationInEpoch: varDiskEncryptionKeyExpirationInEpoch
