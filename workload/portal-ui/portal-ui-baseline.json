@@ -685,8 +685,8 @@
                                 {
                                     "name": "sessionHostEncryptionAtHost",
                                     "type": "Microsoft.Common.CheckBox",
-                                    "visible": "[(equals(steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption, false))]",
-                                    "label": "Encryption At Host configuration",
+                                    "visible": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption]",
+                                    "label": "Encryption At Host",
                                     "defaultValue": false,
                                     "toolTip": "Enables Encryption At Host with Customer Managed Keys on management VM and session hosts disks"
                                 },
@@ -703,8 +703,8 @@
                                 {
                                     "name": "sessionHostAzureDiskEncryption",
                                     "type": "Microsoft.Common.CheckBox",
-                                    "visible": "[(equals(steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost, false))]",
-                                    "label": "Azure Disk Encryption configuration",
+                                    "visible": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost]",
+                                    "label": "Azure Disk Encryption",
                                     "defaultValue": false,
                                     "toolTip": "Enables Azure Disk Encryption on management VM and session hosts disks"
                                 },
