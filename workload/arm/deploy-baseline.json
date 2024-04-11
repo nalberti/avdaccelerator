@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "309124278104255945"
+      "templateHash": "6095046304369443476"
     },
     "name": "AVD Accelerator - Baseline Deployment",
     "description": "AVD Accelerator - Deployment Baseline"
@@ -18562,7 +18562,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "964286251418498615"
+              "templateHash": "9728230462866581183"
             }
           },
           "parameters": {
@@ -18704,7 +18704,7 @@
                 "name": "ztPolicyDefinitions",
                 "count": "[length(variables('varCustomPolicyDefinitions'))]"
               },
-              "condition": "[parameters('diskZeroTrust')]",
+              "condition": "[equals(parameters('diskZeroTrust'), true())]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "[format('Policy-Defin-{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, parameters('time'))]",
@@ -18886,7 +18886,7 @@
                 "name": "ztPolicyAssignmentServiceObjects",
                 "count": "[length(variables('varCustomPolicyDefinitions'))]"
               },
-              "condition": "[parameters('diskZeroTrust')]",
+              "condition": "[equals(parameters('diskZeroTrust'), true())]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "[format('Pol-Assign-ServObj{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, parameters('time'))]",
@@ -19181,7 +19181,7 @@
                 "name": "ztPolicyServBojRemediationTask",
                 "count": "[length(variables('varCustomPolicyDefinitions'))]"
               },
-              "condition": "[parameters('diskZeroTrust')]",
+              "condition": "[equals(parameters('diskZeroTrust'), true())]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "[format('Remm-ServObj-{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, copyIndex())]",
@@ -19248,7 +19248,7 @@
                 "name": "ztPolicyAssignmentCompute",
                 "count": "[length(variables('varCustomPolicyDefinitions'))]"
               },
-              "condition": "[parameters('diskZeroTrust')]",
+              "condition": "[equals(parameters('diskZeroTrust'), true())]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "[format('Pol-Assign-Comp-{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, parameters('time'))]",
@@ -19543,7 +19543,7 @@
                 "name": "ztPolicyComputeRemediationTask",
                 "count": "[length(variables('varCustomPolicyDefinitions'))]"
               },
-              "condition": "[parameters('diskZeroTrust')]",
+              "condition": "[equals(parameters('diskZeroTrust'), true())]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "[format('Remm-Comp-{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, copyIndex())]",
@@ -19610,7 +19610,7 @@
                 "name": "ztRoleAssignmentCompute",
                 "count": "[length(variables('varCustomPolicyDefinitions'))]"
               },
-              "condition": "[parameters('diskZeroTrust')]",
+              "condition": "[equals(parameters('diskZeroTrust'), true())]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "[format('ZT-RA-Comp-{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, parameters('time'))]",
@@ -20194,7 +20194,7 @@
                 "name": "ztRoleAssignmentServObj",
                 "count": "[length(variables('varCustomPolicyDefinitions'))]"
               },
-              "condition": "[parameters('diskZeroTrust')]",
+              "condition": "[equals(parameters('diskZeroTrust'), true())]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "[format('ZT-RA-ServObj-{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, parameters('time'))]",
