@@ -164,7 +164,6 @@ var varManagedDisk = empty(diskEncryptionSetResourceId) ? {
     storageAccountType: diskType
 }
 
-//D2 Azure Disk Encryption
 var azureDiskEncryptionSettings = {
                 EncryptionOperation:    'EnableEncryption'
                 KeyVaultURL:            adeKeyVaultUri
