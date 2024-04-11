@@ -126,7 +126,7 @@ module ztPolicyServBojRemediationTask '../azurePolicyAssignmentRemediation/deplo
     name: 'Remm-ServObj-${customPolicyDefinition.deploymentName}-${i}'
     params: {
         deploymentName: '${customPolicyDefinition.deploymentName}-${i}'
-        policyAssignmentId: ztPolicyAssignmentServiceObjects[i].outputs.resourceId
+        policyAssignmentId: diskZeroTrust ? ztPolicyAssignmentServiceObjects[i].outputs.resourceId : ''
     }
 }]
 
@@ -163,7 +163,7 @@ module ztPolicyComputeRemediationTask '../azurePolicyAssignmentRemediation/deplo
     name: 'Remm-Comp-${customPolicyDefinition.deploymentName}-${i}'
     params: {
         deploymentName: '${customPolicyDefinition.deploymentName}-${i}'
-        policyAssignmentId: ztPolicyAssignmentCompute[i].outputs.resourceId
+        policyAssignmentId: diskZeroTrust ? ztPolicyAssignmentCompute[i].outputs.resourceId : ''
     }
 }]
 
