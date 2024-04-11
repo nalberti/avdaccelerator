@@ -13,6 +13,12 @@ param subscriptionId string
 @sys.description('Enables a zero trust configuration on the session host disks.')
 param diskZeroTrust bool
 
+@sys.description('Enables Encryption At Host on the session host disk.')
+param encryptionAtHost bool
+
+@sys.description('Enables Azure Disk Encryption on the session host disk.')
+param azureDiskEncryption bool
+
 @sys.description('AVD Resource Group Name for the service objects.')
 param serviceObjectsRgName string
 
@@ -187,31 +193,19 @@ module ztRoleAssignmentServObj '../../../../carml/1.3.0/Microsoft.Authorization/
     }
 }]
 
-// User Assigned Identity for Zero Trust.
-//module ztManagedIdentity '../../../../carml/1.3.0/Microsoft.ManagedIdentity/userAssignedIdentities/deploy.bicep' = {
-//    scope: resourceGroup('${subscriptionId}', '${serviceObjectsRgName}')
-//    name: 'ZT-Managed-ID-${time}'
-//    params: {
-//        location: location
-//        name: managedIdentityName
-//        tags: tags
-//    }
-//    dependsOn: []
-//}
-
 // Role Assignment for Zero Trust.
-module ztRoleAssignment '../../../../carml/1.3.0/Microsoft.Authorization/roleAssignments/resourceGroup/deploy.bicep' = if (diskZeroTrust) {
+module ztRoleAssignment '../../../../carml/1.3.0/Microsoft.Authorization/roleAssignments/resourceGroup/deploy.bicep' = if (encryptionAtHost) {
     scope: resourceGroup('${subscriptionId}', '${serviceObjectsRgName}')
     name: 'ZT-RoleAssign-${time}'
     params: {
-        principalId: diskZeroTrust ? ztKeyVault.outputs.ztDiskEncryptionSetPrincipalId : ''
+        principalId: encryptionAtHost ? ztKeyVault.outputs.ztDiskEncryptionSetPrincipalId : ''
         roleDefinitionIdOrName: 'Key Vault Crypto Service Encryption User'
         principalType: 'ServicePrincipal'
     }
 }
 
 // Zero trust key vault.
-module ztKeyVault './.bicep/zeroTrustKeyVault.bicep' = if (diskZeroTrust) {
+module ztKeyVault './.bicep/zeroTrustKeyVault.bicep' = if (azureDiskEncryption || encryptionAtHost) {
     scope: resourceGroup('${subscriptionId}', '${serviceObjectsRgName}')
     name: 'ZT-Key-Vault-${time}'
     params: {
@@ -227,7 +221,6 @@ module ztKeyVault './.bicep/zeroTrustKeyVault.bicep' = if (diskZeroTrust) {
         diskEncryptionKeyExpirationInDays: diskEncryptionKeyExpirationInDays
         diskEncryptionKeyExpirationInEpoch: diskEncryptionKeyExpirationInEpoch
         diskEncryptionSetName: diskEncryptionSetName
-//        ztManagedIdentityResourceId: diskZeroTrust ? ztManagedIdentity.outputs.resourceId : ''
         tags: union(tags, kvTags)
         enableKvPurgeProtection: enableKvPurgeProtection
     }
@@ -237,4 +230,7 @@ module ztKeyVault './.bicep/zeroTrustKeyVault.bicep' = if (diskZeroTrust) {
 // Outputs //
 // =========== //
 
-output ztDiskEncryptionSetResourceId string = diskZeroTrust ? ztKeyVault.outputs.ztDiskEncryptionSetResourceId : ''
+output ztDiskEncryptionSetResourceId string = encryptionAtHost ? ztKeyVault.outputs.ztDiskEncryptionSetResourceId : ''
+output ztKeyVaultUri string = (azureDiskEncryption || encryptionAtHost) ? ztKeyVault.outputs.ztKeyVaultUri : ''
+output ztKeyVaultResourceId string = (azureDiskEncryption || encryptionAtHost) ? ztKeyVault.outputs.ztKeyVaultResourceId : ''
+output ztKeyVaultKeyUri string = (azureDiskEncryption || encryptionAtHost) ? ztKeyVault.outputs.ztKeyVaultKeyUri : ''

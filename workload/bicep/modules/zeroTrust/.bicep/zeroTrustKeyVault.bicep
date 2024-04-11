@@ -134,7 +134,7 @@ module ztKeyVaultKey '../../../../../carml/1.3.0/Microsoft.KeyVault/vaults/keys/
 }
 
 // Disk Encryption Set for Zero Trust.
-module ztDiskEncryptionSet '../../../../../carml/1.3.0/Microsoft.Compute/diskEncryptionSets/deploy.bicep' = {
+module ztDiskEncryptionSet '../../../../../carml/1.3.0/Microsoft.Compute/diskEncryptionSets/deploy.bicep' = if (!empty(diskEncryptionSetName)) {
     scope: resourceGroup('${subscriptionId}', '${rgName}')
     name: 'ZT-DiskEncryptionSet-${time}'
     params: {
@@ -155,5 +155,8 @@ module ztDiskEncryptionSet '../../../../../carml/1.3.0/Microsoft.Compute/diskEnc
 // Outputs //
 // =========== //
 
-output ztDiskEncryptionSetResourceId string = ztDiskEncryptionSet.outputs.resourceId
-output ztDiskEncryptionSetPrincipalId string = ztDiskEncryptionSet.outputs.principalId
+output ztDiskEncryptionSetResourceId string = (!empty(diskEncryptionSetName)) ? ztDiskEncryptionSet.outputs.resourceId : ''
+output ztDiskEncryptionSetPrincipalId string = (!empty(diskEncryptionSetName)) ? ztDiskEncryptionSet.outputs.principalId : ''
+output ztKeyVaultUri string = ztKeyVault.outputs.uri
+output ztKeyVaultResourceId string = ztKeyVault.outputs.resourceId
+output ztKeyVaultKeyUri string = ztKeyVaultKey.outputs.uri

@@ -7,6 +7,15 @@ targetScope = 'subscription'
 @sys.description('AVD disk encryption set resource ID to enable server side encyption.')
 param diskEncryptionSetResourceId string
 
+@sys.description('Key Vault ResourceID for Azure Disk Encryption')
+param adeKeyVaultResourceId string
+
+@sys.description('Key Vault Uri for Azure Disk Encryption')
+param adeKeyVaultUri string
+
+@sys.description('Key Vault Key Uri for Azure Disk Encryption')
+param adeKeyVaultKeyUri string
+
 @sys.description('AVD subnet ID.')
 param subnetId string
 
@@ -52,8 +61,11 @@ param identityServiceProvider string
 @sys.description('Enroll session hosts on Intune.')
 param createIntuneEnrollment bool
 
-@sys.description('This property can be used by user in the request to enable or disable the Host Encryption for the virtual machine. This will enable the encryption for all the disks including Resource/Temp disk at host itself. For security reasons, it is recommended to set encryptionAtHost to True. Restrictions: Cannot be enabled if Azure Disk Encryption (guest-VM encryption using bitlocker/DM-Crypt) is enabled on your VMs.')
+@sys.description('This property can be used by user in the request to enable or disable Encryption At Host for the virtual machine. This will enable the encryption for all the disks including Resource/Temp disk at host itself. For security reasons, it is recommended to set encryptionAtHost to True. Restrictions: Cannot be enabled if Azure Disk Encryption (guest-VM encryption using bitlocker/DM-Crypt) is enabled on your VMs.')
 param encryptionAtHost bool
+
+@sys.description('This property can be used by user in the request to enable or disable the Azure Disk Encryption extension for the virtual machine. This will enable the encryption for all the disks including Resource/Temp disk at host itself. For security reasons, it is recommended to set azureDiskEncryption to True. Restrictions: Cannot be enabled if EncryptionAtHost is enabled on your VMs.')
+param azureDiskEncryption bool
 
 @sys.description('Session host VM size.')
 param vmSize string
@@ -151,6 +163,18 @@ var varManagedDisk = empty(diskEncryptionSetResourceId) ? {
     }
     storageAccountType: diskType
 }
+
+//D2 Azure Disk Encryption
+var azureDiskEncryptionSettings = {
+                EncryptionOperation:    'EnableEncryption'
+                KeyVaultURL:            adeKeyVaultUri
+                KeyVaultResourceId:     adeKeyVaultResourceId
+                KeyEncryptionKeyURL:    adeKeyVaultKeyUri
+                KekVaultResourceId:     adeKeyVaultResourceId
+                KeyEncryptionAlgorithm: 'RSA-OAEP-256'
+                VolumeType:             'All'
+                ResizeOSDisk:           false
+              }
 
 var varOsDiskProperties = {
     createOption: 'fromImage'
@@ -253,6 +277,28 @@ module sessionHosts '../../../../carml/1.3.0/Microsoft.Compute/virtualMachines/d
     ]
 }]
 
+// Add Azure Disk Encryption extension to session host.
+module sessionHostsAzureDiskEncryption '../../../../carml/1.3.0/Microsoft.Compute/virtualMachines/extensions/deploy.bicep' = [for i in range(1, count): if (azureDiskEncryption) {
+    scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
+    name: 'SH-ADE-${batchId}-${i - 1}-${time}'
+    params: {
+        virtualMachineName: '${namePrefix}${padLeft((i + countIndex), 3, '0')}'
+        name: 'AzureDiskEncryption'
+        location: location
+        publisher: 'Microsoft.Azure.Security'
+        type: 'AzureDiskEncryption'
+        typeHandlerVersion: '2.2'
+        autoUpgradeMinorVersion: true
+        forceUpdateTag: '1.0'
+        settings: azureDiskEncryptionSettings
+        enableAutomaticUpgrade: false
+        }
+    dependsOn: [
+        sessionHosts
+    ]
+}]
+
+
 // Add antimalware extension to session host.
 module sessionHostsAntimalwareExtension '../../../../carml/1.3.0/Microsoft.Compute/virtualMachines/extensions/deploy.bicep' = [for i in range(1, count): {
     scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
@@ -285,6 +331,7 @@ module sessionHostsAntimalwareExtension '../../../../carml/1.3.0/Microsoft.Compu
     }
     dependsOn: [
         sessionHosts
+        sessionHostsAzureDiskEncryption
     ]
 }]
 

@@ -113,3 +113,6 @@ output resourceId string = key.id
 
 @description('The name of the resource group the key was created in.')
 output resourceGroupName string = resourceGroup().name
+
+@description('The uri of the key vault key')
+output uri string = key.properties.keyUriWithVersion

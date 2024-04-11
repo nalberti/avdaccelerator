@@ -107,7 +107,7 @@ param time string = utcNow()
 // =========== //
 // Variable declaration //
 // =========== //
-var varApplicaitonGroups = [
+var varApplicationGroups = [
   {
     name: applicationGroupName
     friendlyName: applicationGroupFriendlyNameDesktop
@@ -222,7 +222,7 @@ module hostPool '../../../../carml/1.3.0/Microsoft.DesktopVirtualization/hostpoo
 }
 
 // Application groups.
-module applicationGroups '../../../../carml/1.3.0/Microsoft.DesktopVirtualization/applicationgroups/deploy.bicep' = [for applicationGroup in varApplicaitonGroups: {
+module applicationGroups '../../../../carml/1.3.0/Microsoft.DesktopVirtualization/applicationgroups/deploy.bicep' = [for applicationGroup in varApplicationGroups: {
   scope: resourceGroup('${workloadSubsId}', '${serviceObjectsRgName}')
   name: '${applicationGroup.name}-${time}'
   params: {
