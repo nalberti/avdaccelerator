@@ -281,7 +281,7 @@ module sessionHostsAzureDiskEncryption '../../../../carml/1.3.0/Microsoft.Comput
     scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
     name: 'SH-ADE-${batchId}-${i - 1}-${time}'
     params: {
-        virtualMachineName: '${namePrefix}${padLeft((i + countIndex), 3, '0')}'
+        virtualMachineName: '${namePrefix}${padLeft((i + countIndex), 4, '0')}'
         name: 'AzureDiskEncryption'
         location: location
         publisher: 'Microsoft.Azure.Security'

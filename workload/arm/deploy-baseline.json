@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "6858931354446109193"
+      "templateHash": "16032667114553679879"
     },
     "name": "AVD Accelerator - Baseline Deployment",
     "description": "AVD Accelerator - Deployment Baseline"
@@ -40553,7 +40553,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "7222400606713175488"
+              "templateHash": "3247021548401748426"
             }
           },
           "parameters": {
@@ -45229,7 +45229,7 @@
                 "mode": "Incremental",
                 "parameters": {
                   "virtualMachineName": {
-                    "value": "[format('{0}{1}', parameters('namePrefix'), padLeft(add(range(1, parameters('count'))[copyIndex()], parameters('countIndex')), 3, '0'))]"
+                    "value": "[format('{0}{1}', parameters('namePrefix'), padLeft(add(range(1, parameters('count'))[copyIndex()], parameters('countIndex')), 4, '0'))]"
                   },
                   "name": {
                     "value": "AzureDiskEncryption"
