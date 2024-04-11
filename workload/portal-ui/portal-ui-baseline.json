@@ -691,9 +691,9 @@
                                     "toolTip": "Enables Encryption At Host with Customer Managed Keys on management VM and session hosts disks"
                                 },
                                 {
-                                    "name": "ssessionHostEncryptionAtHostWarning",
+                                    "name": "sessionHostEncryptionAtHostWarning",
                                     "type": "Microsoft.Common.InfoBox",
-                                    "visible": "[(steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost)]",
+                                    "visible": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost]",
                                     "options": {
                                         "text": "Encryption At Host disk encryption requires feature EncryptionAtHost of resource provider Microsoft.Compute to be registered in the subscription. The Encryption At Host feature can not be used with Azure Disk Encryption.",
                                         "uri": "https://learn.microsoft.com/azure/virtual-machines/disks-enable-host-based-encryption-portal?tabs=azure-powershell",
@@ -709,9 +709,9 @@
                                     "toolTip": "Enables Azure Disk Encryption on management VM and session hosts disks"
                                 },
                                 {
-                                    "name": "ssessionHostAzureDiskEncryptionWarning",
+                                    "name": "sessionHostAzureDiskEncryptionWarning",
                                     "type": "Microsoft.Common.InfoBox",
-                                    "visible": "[(steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption)]",
+                                    "visible": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption]",
                                     "options": {
                                         "text": "Azure Disk Encryption can not be used with Encryption At Host disk encryption. ",
                                         "uri": "https://learn.microsoft.com/en-us/azure/virtual-machines/windows/disk-encryption-overview",
