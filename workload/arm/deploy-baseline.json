@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "12032997900795201533"
+      "templateHash": "309124278104255945"
     },
     "name": "AVD Accelerator - Baseline Deployment",
     "description": "AVD Accelerator - Deployment Baseline"
@@ -18562,7 +18562,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "9892697416976690295"
+              "templateHash": "964286251418498615"
             }
           },
           "parameters": {
@@ -19196,9 +19196,7 @@
                   "deploymentName": {
                     "value": "[format('{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, copyIndex())]"
                   },
-                  "policyAssignmentId": {
-                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', format('{0}', parameters('subscriptionId')), format('{0}', parameters('serviceObjectsRgName'))), 'Microsoft.Resources/deployments', format('Pol-Assign-ServObj{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, parameters('time'))), '2022-09-01').outputs.resourceId.value]"
-                  }
+                  "policyAssignmentId": "[if(parameters('diskZeroTrust'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', format('{0}', parameters('subscriptionId')), format('{0}', parameters('serviceObjectsRgName'))), 'Microsoft.Resources/deployments', format('Pol-Assign-ServObj{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, parameters('time'))), '2022-09-01').outputs.resourceId.value), createObject('value', ''))]"
                 },
                 "template": {
                   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
@@ -19560,9 +19558,7 @@
                   "deploymentName": {
                     "value": "[format('{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, copyIndex())]"
                   },
-                  "policyAssignmentId": {
-                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', format('{0}', parameters('subscriptionId')), format('{0}', parameters('computeObjectsRgName'))), 'Microsoft.Resources/deployments', format('Pol-Assign-Comp-{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, parameters('time'))), '2022-09-01').outputs.resourceId.value]"
-                  }
+                  "policyAssignmentId": "[if(parameters('diskZeroTrust'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', format('{0}', parameters('subscriptionId')), format('{0}', parameters('computeObjectsRgName'))), 'Microsoft.Resources/deployments', format('Pol-Assign-Comp-{0}-{1}', variables('varCustomPolicyDefinitions')[copyIndex()].deploymentName, parameters('time'))), '2022-09-01').outputs.resourceId.value), createObject('value', ''))]"
                 },
                 "template": {
                   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
