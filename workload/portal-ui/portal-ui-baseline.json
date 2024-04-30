@@ -680,15 +680,41 @@
                                     "type": "Microsoft.Common.CheckBox",
                                     "label": "Zero trust disk configuration",
                                     "defaultValue": false,
-                                    "toolTip": "Enables disk encryption and Zero trust settings on management VM and session hosts disks"
+                                    "toolTip": "Enables Zero trust policy settings on management VM and session hosts disks"
                                 },
                                 {
-                                    "name": "ssessionHostDiskZeroTrustWarning",
+                                    "name": "sessionHostEncryptionAtHost",
+                                    "type": "Microsoft.Common.CheckBox",
+                                    "visible": "[not(steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption)]",
+                                    "label": "Encryption At Host",
+                                    "defaultValue": false,
+                                    "toolTip": "Enables Encryption At Host with Customer Managed Keys on management VM and session hosts disks"
+                                },
+                                {
+                                    "name": "sessionHostEncryptionAtHostWarning",
                                     "type": "Microsoft.Common.InfoBox",
-                                    "visible": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostDiskZeroTrust]",
+                                    "visible": "[not(steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption)]",
                                     "options": {
-                                        "text": "Zero trust disk encryption requires feature EncryptionAtHost of resource provider Microsoft.Compute to be registered in the subscription.",
+                                        "text": "Encryption At Host disk encryption requires feature EncryptionAtHost of resource provider Microsoft.Compute to be registered in the subscription. The Encryption At Host feature can not be used with Azure Disk Encryption.",
                                         "uri": "https://learn.microsoft.com/azure/virtual-machines/disks-enable-host-based-encryption-portal?tabs=azure-powershell",
+                                        "style": "Warning"
+                                    }
+                                },
+                                {
+                                    "name": "sessionHostAzureDiskEncryption",
+                                    "type": "Microsoft.Common.CheckBox",
+                                    "visible": "[not(steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost)]",
+                                    "label": "Azure Disk Encryption",
+                                    "defaultValue": false,
+                                    "toolTip": "Enables Azure Disk Encryption on management VM and session hosts disks"
+                                },
+                                {
+                                    "name": "sessionHostAzureDiskEncryptionWarning",
+                                    "type": "Microsoft.Common.InfoBox",
+                                    "visible": "[not(steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost)]",
+                                    "options": {
+                                        "text": "Azure Disk Encryption can not be used with Encryption At Host disk encryption. ",
+                                        "uri": "https://learn.microsoft.com/en-us/azure/virtual-machines/windows/disk-encryption-overview",
                                         "style": "Warning"
                                     }
                                 },
@@ -2356,6 +2382,8 @@
                 "deploymentPrefix": "[steps('basics').deploymentSpecs.deploymentPrefix]",
                 "deploymentEnvironment": "[steps('basics').deploymentSpecs.deploymentEnvironment]",
                 "diskZeroTrust": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostDiskZeroTrust]",
+                "encryptionAtHost": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostEncryptionAtHost]",
+                "azureDiskEncryption": "[steps('sessionHosts').sessionHostsSettingsSection.sessionHostAzureDiskEncryption]",
                 "avdManagementPlaneLocation": "[steps('basics').resourceScope.location.name]",
                 "avdSessionHostLocation": "[if(equals(steps('sessionHosts').deploySessionHosts, true), steps('sessionHosts').sessionHostsRegionSection.sessionHostsRegion, steps('basics').resourceScope.location.name)]",
                 "avdWorkloadSubsId": "[steps('basics').resourceScope.subscription.subscriptionId]",

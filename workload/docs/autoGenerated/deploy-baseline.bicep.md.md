@@ -64,7 +64,9 @@ avsetFaultDomainCount | No       | Sets the number of fault domains for the avai
 avsetUpdateDomainCount | No       | Sets the number of update domains for the availability set. (Default: 5)
 fslogixStoragePerformance | No       | Storage account SKU for FSLogix storage. Recommended tier is Premium (Default: Premium)
 msixStoragePerformance | No       | Storage account SKU for MSIX storage. Recommended tier is Premium. (Default: Premium)
-diskZeroTrust  | No       | Enables a zero trust configuration on the session host disks. (Default: false)
+diskZeroTrust  | No       | Enables a zero trust configuration on the session host disks with Azure Policy. (Default: false)
+encryptionAtHost  | No       | Encrypts the session host disks using Encryption At Host. (Default: false)
+azureDiskEncryption  | No       | Encrypts the session host disks using Azure Disk Encryption. (Default: false)
 avdSessionHostsSize | No       | Session host VM size. (Default: Standard_D4ads_v5)
 avdSessionHostDiskType | No       | OS disk type for session host. (Default: Premium_LRS)
 enableAcceleratedNetworking | No       | Enables accelerated Networking on the session hosts. If using a Azure Compute Gallery Image, the Image Definition must have been configured with the \'isAcceleratedNetworkSupported\' property set to \'true\'. 
@@ -577,7 +579,23 @@ Storage account SKU for MSIX storage. Recommended tier is Premium. (Default: Pre
 
 ![Parameter Setting](https://img.shields.io/badge/parameter-optional-green?style=flat-square)
 
-Enables a zero trust configuration on the session host disks. (Default: false)
+Enables a zero trust configuration on the session host disks with Azure Policy. (Default: false)
+
+- Default value: `False`
+
+### encryptionAtHost
+
+![Parameter Setting](https://img.shields.io/badge/parameter-optional-green?style=flat-square)
+
+Enables Encryption At Host with Customer Managed Keys on the session host disks. (Default: false)
+
+- Default value: `False`
+
+### azureDiskEncryption
+
+![Parameter Setting](https://img.shields.io/badge/parameter-optional-green?style=flat-square)
+
+Enables Azure Disk Encryption on the session host disks. (Default: false)
 
 - Default value: `False`
 

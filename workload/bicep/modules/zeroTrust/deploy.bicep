@@ -13,14 +13,17 @@ param subscriptionId string
 @sys.description('Enables a zero trust configuration on the session host disks.')
 param diskZeroTrust bool
 
+@sys.description('Enables Encryption At Host on the session host disk.')
+param encryptionAtHost bool
+
+@sys.description('Enables Azure Disk Encryption on the session host disk.')
+param azureDiskEncryption bool
+
 @sys.description('AVD Resource Group Name for the service objects.')
 param serviceObjectsRgName string
 
 @sys.description('AVD Resource Group Name for the service objects.')
 param computeObjectsRgName string
-
-@sys.description('Managed identity for zero trust setup.')
-param managedIdentityName string
 
 @sys.description('This value is used to set the expiration date on the disk encryption key.')
 param diskEncryptionKeyExpirationInDays int
@@ -73,10 +76,9 @@ var varCustomPolicyDefinitions = [
 // =========== //
 // Deployments //
 // =========== //
-// call on the keyvault.
 
 // Policy Definition for Managed Disk Network Access.
-module ztPolicyDefinitions '../../../../carml/1.3.0/Microsoft.Authorization/policyDefinitions/subscription/deploy.bicep' = [for customPolicyDefinition in varCustomPolicyDefinitions: if (diskZeroTrust) {
+module ztPolicyDefinitions '../../../../carml/1.3.0/Microsoft.Authorization/policyDefinitions/subscription/deploy.bicep' = [for customPolicyDefinition in varCustomPolicyDefinitions: if (diskZeroTrust == true) {
     scope: subscription('${subscriptionId}')
     name: 'Policy-Defin-${customPolicyDefinition.deploymentName}-${time}'
     params: {
@@ -92,7 +94,7 @@ module ztPolicyDefinitions '../../../../carml/1.3.0/Microsoft.Authorization/poli
 }]
 
 // Policy Assignment for Managed Disk Network Access.
-module ztPolicyAssignmentServiceObjects '../../../../carml/1.3.0/Microsoft.Authorization/policyAssignments/resourceGroup/deploy.bicep' = [for (customPolicyDefinition, i) in varCustomPolicyDefinitions: if (diskZeroTrust) {
+module ztPolicyAssignmentServiceObjects '../../../../carml/1.3.0/Microsoft.Authorization/policyAssignments/resourceGroup/deploy.bicep' = [for (customPolicyDefinition, i) in varCustomPolicyDefinitions: if (diskZeroTrust == true) {
     scope: resourceGroup('${subscriptionId}', '${serviceObjectsRgName}')
     name: 'Pol-Assign-ServObj${customPolicyDefinition.deploymentName}-${time}'
     params: {
@@ -119,17 +121,17 @@ module ztPolicyAssignmentServiceObjects '../../../../carml/1.3.0/Microsoft.Autho
 }]
 
 // Policy Remediation Task for Zero Trust.
-module ztPolicyServBojRemediationTask '../azurePolicyAssignmentRemediation/deploy.bicep' = [for (customPolicyDefinition, i) in varCustomPolicyDefinitions: if (diskZeroTrust) {
+module ztPolicyServBojRemediationTask '../azurePolicyAssignmentRemediation/deploy.bicep' = [for (customPolicyDefinition, i) in varCustomPolicyDefinitions: if (diskZeroTrust == true) {
     scope: resourceGroup('${subscriptionId}', '${serviceObjectsRgName}')
     name: 'Remm-ServObj-${customPolicyDefinition.deploymentName}-${i}'
     params: {
         deploymentName: '${customPolicyDefinition.deploymentName}-${i}'
-        policyAssignmentId: ztPolicyAssignmentServiceObjects[i].outputs.resourceId
+        policyAssignmentId: diskZeroTrust ? ztPolicyAssignmentServiceObjects[i].outputs.resourceId : ''
     }
 }]
 
 // Policy Assignment for Managed Disk Network Access.
-module ztPolicyAssignmentCompute '../../../../carml/1.3.0/Microsoft.Authorization/policyAssignments/resourceGroup/deploy.bicep' = [for (customPolicyDefinition, i) in varCustomPolicyDefinitions: if (diskZeroTrust) {
+module ztPolicyAssignmentCompute '../../../../carml/1.3.0/Microsoft.Authorization/policyAssignments/resourceGroup/deploy.bicep' = [for (customPolicyDefinition, i) in varCustomPolicyDefinitions: if (diskZeroTrust == true) {
     scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
     name: 'Pol-Assign-Comp-${customPolicyDefinition.deploymentName}-${time}'
     params: {
@@ -156,17 +158,17 @@ module ztPolicyAssignmentCompute '../../../../carml/1.3.0/Microsoft.Authorizatio
 }]
 
 // Policy Remediation Task for Zero Trust.
-module ztPolicyComputeRemediationTask '../azurePolicyAssignmentRemediation/deploy.bicep' = [for (customPolicyDefinition, i) in varCustomPolicyDefinitions: if (diskZeroTrust) {
+module ztPolicyComputeRemediationTask '../azurePolicyAssignmentRemediation/deploy.bicep' = [for (customPolicyDefinition, i) in varCustomPolicyDefinitions: if (diskZeroTrust == true) {
     scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
     name: 'Remm-Comp-${customPolicyDefinition.deploymentName}-${i}'
     params: {
         deploymentName: '${customPolicyDefinition.deploymentName}-${i}'
-        policyAssignmentId: ztPolicyAssignmentCompute[i].outputs.resourceId
+        policyAssignmentId: diskZeroTrust ? ztPolicyAssignmentCompute[i].outputs.resourceId : ''
     }
 }]
 
 // Role Assignment for Zero Trust.
-module ztRoleAssignmentCompute '../../../../carml/1.3.0/Microsoft.Authorization/roleAssignments/resourceGroup/deploy.bicep' = [for (customPolicyDefinition, i) in varCustomPolicyDefinitions: if (diskZeroTrust) {
+module ztRoleAssignmentCompute '../../../../carml/1.3.0/Microsoft.Authorization/roleAssignments/resourceGroup/deploy.bicep' = [for (customPolicyDefinition, i) in varCustomPolicyDefinitions: if (diskZeroTrust == true) {
     scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
     name: 'ZT-RA-Comp-${customPolicyDefinition.deploymentName}-${time}'
     params: {
@@ -177,7 +179,7 @@ module ztRoleAssignmentCompute '../../../../carml/1.3.0/Microsoft.Authorization/
 }]
 
 // Role Assignment for Zero Trust.
-module ztRoleAssignmentServObj '../../../../carml/1.3.0/Microsoft.Authorization/roleAssignments/resourceGroup/deploy.bicep' = [for (customPolicyDefinition, i) in varCustomPolicyDefinitions: if (diskZeroTrust) {
+module ztRoleAssignmentServObj '../../../../carml/1.3.0/Microsoft.Authorization/roleAssignments/resourceGroup/deploy.bicep' = [for (customPolicyDefinition, i) in varCustomPolicyDefinitions: if (diskZeroTrust == true) {
     scope: resourceGroup('${subscriptionId}', '${serviceObjectsRgName}')
     name: 'ZT-RA-ServObj-${customPolicyDefinition.deploymentName}-${time}'
     params: {
@@ -187,31 +189,19 @@ module ztRoleAssignmentServObj '../../../../carml/1.3.0/Microsoft.Authorization/
     }
 }]
 
-// User Assigned Identity for Zero Trust.
-//module ztManagedIdentity '../../../../carml/1.3.0/Microsoft.ManagedIdentity/userAssignedIdentities/deploy.bicep' = {
-//    scope: resourceGroup('${subscriptionId}', '${serviceObjectsRgName}')
-//    name: 'ZT-Managed-ID-${time}'
-//    params: {
-//        location: location
-//        name: managedIdentityName
-//        tags: tags
-//    }
-//    dependsOn: []
-//}
-
 // Role Assignment for Zero Trust.
-module ztRoleAssignment '../../../../carml/1.3.0/Microsoft.Authorization/roleAssignments/resourceGroup/deploy.bicep' = if (diskZeroTrust) {
+module ztRoleAssignment '../../../../carml/1.3.0/Microsoft.Authorization/roleAssignments/resourceGroup/deploy.bicep' = if (encryptionAtHost) {
     scope: resourceGroup('${subscriptionId}', '${serviceObjectsRgName}')
     name: 'ZT-RoleAssign-${time}'
     params: {
-        principalId: diskZeroTrust ? ztKeyVault.outputs.ztDiskEncryptionSetPrincipalId : ''
+        principalId: encryptionAtHost ? ztKeyVault.outputs.ztDiskEncryptionSetPrincipalId : ''
         roleDefinitionIdOrName: 'Key Vault Crypto Service Encryption User'
         principalType: 'ServicePrincipal'
     }
 }
 
 // Zero trust key vault.
-module ztKeyVault './.bicep/zeroTrustKeyVault.bicep' = if (diskZeroTrust) {
+module ztKeyVault './.bicep/zeroTrustKeyVault.bicep' = if (azureDiskEncryption || encryptionAtHost) {
     scope: resourceGroup('${subscriptionId}', '${serviceObjectsRgName}')
     name: 'ZT-Key-Vault-${time}'
     params: {
@@ -227,7 +217,6 @@ module ztKeyVault './.bicep/zeroTrustKeyVault.bicep' = if (diskZeroTrust) {
         diskEncryptionKeyExpirationInDays: diskEncryptionKeyExpirationInDays
         diskEncryptionKeyExpirationInEpoch: diskEncryptionKeyExpirationInEpoch
         diskEncryptionSetName: diskEncryptionSetName
-//        ztManagedIdentityResourceId: diskZeroTrust ? ztManagedIdentity.outputs.resourceId : ''
         tags: union(tags, kvTags)
         enableKvPurgeProtection: enableKvPurgeProtection
     }
@@ -237,4 +226,7 @@ module ztKeyVault './.bicep/zeroTrustKeyVault.bicep' = if (diskZeroTrust) {
 // Outputs //
 // =========== //
 
-output ztDiskEncryptionSetResourceId string = diskZeroTrust ? ztKeyVault.outputs.ztDiskEncryptionSetResourceId : ''
+output ztDiskEncryptionSetResourceId string = encryptionAtHost ? ztKeyVault.outputs.ztDiskEncryptionSetResourceId : ''
+output ztKeyVaultUri string = (azureDiskEncryption || encryptionAtHost) ? ztKeyVault.outputs.ztKeyVaultUri : ''
+output ztKeyVaultResourceId string = (azureDiskEncryption || encryptionAtHost) ? ztKeyVault.outputs.ztKeyVaultResourceId : ''
+output ztKeyVaultKeyUri string = (azureDiskEncryption || encryptionAtHost) ? ztKeyVault.outputs.ztKeyVaultKeyUri : ''

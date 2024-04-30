@@ -226,6 +226,12 @@ param msixStoragePerformance string = 'Premium'
 @sys.description('Enables a zero trust configuration on the session host disks. (Default: false)')
 param diskZeroTrust bool = false
 
+@sys.description('Enables Encryption At Host on the session host disks. Can not be enabled if azureDiskEncryption is enabled (Default: false)')
+param encryptionAtHost bool = false
+
+@sys.description('Enables Azure Disk Encryption on the session host disks. Can not be enabled if encryptionAtHost is enabled (Default: false)')
+param azureDiskEncryption bool = false
+
 @sys.description('Session host VM size. (Default: Standard_D4ads_v5)')
 param avdSessionHostsSize string = 'Standard_D4ads_v5'
 
@@ -499,7 +505,6 @@ var varTimeZoneManagementPlane = varLocations[varManagementPlaneLocationLowercas
 var varManagementPlaneNamingStandard = '${varDeploymentPrefixLowercase}-${varDeploymentEnvironmentLowercase}-${varManagementPlaneLocationAcronym}'
 var varComputeStorageResourcesNamingStandard = '${varDeploymentPrefixLowercase}-${varDeploymentEnvironmentLowercase}-${varSessionHostLocationAcronym}'
 var varDiskEncryptionSetName = avdUseCustomNaming ? '${ztDiskEncryptionSetCustomNamePrefix}-${varComputeStorageResourcesNamingStandard}-001' : 'des-zt-${varComputeStorageResourcesNamingStandard}-001'
-var varZtManagedIdentityName = avdUseCustomNaming ? '${ztManagedIdentityCustomName}-${varComputeStorageResourcesNamingStandard}-001' : 'id-zt-${varComputeStorageResourcesNamingStandard}-001'
 var varSessionHostLocationLowercase = toLower(replace(avdSessionHostLocation, ' ', ''))
 var varManagementPlaneLocationLowercase = toLower(replace(avdManagementPlaneLocation, ' ', ''))
 var varServiceObjectsRgName = avdUseCustomNaming ? avdServiceObjectsRgCustomName : 'rg-avd-${varManagementPlaneNamingStandard}-service-objects' // max length limit 90 characters
@@ -702,7 +707,7 @@ var varAllDnsServers = '${customDnsIps},168.63.129.16'
 var varDnsServers = empty(customDnsIps) ? [] : (split(varAllDnsServers, ','))
 var varCreateVnetPeering = !empty(existingHubVnetResourceId) ? true : false
 // Resource tagging
-// Tag Exclude-${varAvdScalingPlanName} is used by scaling plans to exclude session hosts from scaling. Exmaple: Exclude-vdscal-eus2-app1-dev-001
+// Tag Exclude-${varAvdScalingPlanName} is used by scaling plans to exclude session hosts from scaling. Example: Exclude-vdscal-eus2-app1-dev-001
 var varCustomResourceTags = createResourceTags ? {
     WorkloadName: workloadNameTag
     WorkloadType: workloadTypeTag
@@ -823,7 +828,6 @@ module monitoringDiagnosticSettings './modules/avdInsightsMonitoring/deploy.bice
         alaWorkspaceName: deployAlaWorkspace ? varAlaWorkspaceName : ''
         alaWorkspaceDataRetention: avdAlaWorkspaceDataRetention
         subscriptionId: avdWorkloadSubsId
-
         tags: createResourceTags ? union(varCustomResourceTags, varAvdDefaultTags) : varAvdDefaultTags
     }
     dependsOn: [
@@ -938,20 +942,21 @@ module identity './modules/identity/deploy.bicep' = {
 }
 
 // Zero trust
-module zeroTrust './modules/zeroTrust/deploy.bicep' = if (diskZeroTrust && avdDeploySessionHosts) {
+module zeroTrust './modules/zeroTrust/deploy.bicep' = if ((diskZeroTrust || azureDiskEncryption || encryptionAtHost) && avdDeploySessionHosts) {
     scope: subscription(avdWorkloadSubsId)
     name: 'Zero-Trust-${time}'
     params: {
         location: avdSessionHostLocation
         subscriptionId: avdWorkloadSubsId
         diskZeroTrust: diskZeroTrust
+        azureDiskEncryption: azureDiskEncryption
+        encryptionAtHost: encryptionAtHost
         serviceObjectsRgName: varServiceObjectsRgName
         computeObjectsRgName: varComputeObjectsRgName
-        managedIdentityName: varZtManagedIdentityName
         vaultSku: varWrklKeyVaultSku
         diskEncryptionKeyExpirationInDays: diskEncryptionKeyExpirationInDays
         diskEncryptionKeyExpirationInEpoch: varDiskEncryptionKeyExpirationInEpoch
-        diskEncryptionSetName: varDiskEncryptionSetName
+        diskEncryptionSetName: encryptionAtHost ? varDiskEncryptionSetName : ''
         ztKvName: varZtKvName
         ztKvPrivateEndpointName: varZtKvPrivateEndpointName
         privateEndpointsubnetResourceId: createAvdVnet ? '${networking.outputs.virtualNetworkResourceId}/subnets/${varVnetPrivateEndpointSubnetName}' : existingVnetPrivateEndpointSubnetResourceId
@@ -1058,7 +1063,6 @@ module wrklKeyVault '../../carml/1.3.0/Microsoft.KeyVault/vaults/deploy.bicep' =
 module managementVm './modules/storageAzureFiles/.bicep/managementVm.bicep' = if (createAvdFslogixDeployment || varCreateMsixDeployment) {
     name: 'Storage-MGMT-VM-${time}'
     params: {
-        diskEncryptionSetResourceId: diskZeroTrust ? zeroTrust.outputs.ztDiskEncryptionSetResourceId : ''
         identityServiceProvider: avdIdentityServiceProvider
         managementVmName: varManagementVmName
         computeTimeZone: varTimeZoneSessionHosts
@@ -1078,7 +1082,12 @@ module managementVm './modules/storageAzureFiles/.bicep/managementVm.bicep' = if
         vTpmEnabled: vTpmEnabled
         vmLocalUserName: avdVmLocalUserName
         workloadSubsId: avdWorkloadSubsId
-        encryptionAtHost: diskZeroTrust
+        encryptionAtHost: encryptionAtHost
+        diskEncryptionSetResourceId: encryptionAtHost ? zeroTrust.outputs.ztDiskEncryptionSetResourceId : ''
+        azureDiskEncryption: azureDiskEncryption
+        adeKeyVaultUri: azureDiskEncryption ? zeroTrust.outputs.ztKeyVaultUri : ''
+        adeKeyVaultResourceId: azureDiskEncryption ? zeroTrust.outputs.ztKeyVaultResourceId : ''
+        adeKeyVaultKeyUri: azureDiskEncryption ? zeroTrust.outputs.ztKeyVaultKeyUri : ''
         storageManagedIdentityResourceId: varCreateStorageDeployment ? identity.outputs.managedIdentityStorageResourceId : ''
         osImage: varMgmtVmSpecs.osImage
         tags: createResourceTags ? union(varCustomResourceTags, varAvdDefaultTags) : varAvdDefaultTags
@@ -1202,7 +1211,6 @@ module availabilitySet './modules/avdSessionHosts/.bicep/availabilitySets.bicep'
 module sessionHosts './modules/avdSessionHosts/deploy.bicep' = [for i in range(1, varSessionHostBatchCount): if (avdDeploySessionHosts) {
     name: 'SH-Batch-${i - 1}-${time}'
     params: {
-        diskEncryptionSetResourceId: diskZeroTrust ? zeroTrust.outputs.ztDiskEncryptionSetResourceId : ''
         timeZone: varTimeZoneSessionHosts
         asgResourceId: (avdDeploySessionHosts || createAvdFslogixDeployment || varCreateMsixDeployment) ? '${networking.outputs.applicationSecurityGroupResourceId}' : ''
         identityServiceProvider: avdIdentityServiceProvider
@@ -1233,7 +1241,12 @@ module sessionHosts './modules/avdSessionHosts/deploy.bicep' = [for i in range(1
         useAvailabilityZones: availabilityZonesCompute
         vmLocalUserName: avdVmLocalUserName
         subscriptionId: avdWorkloadSubsId
-        encryptionAtHost: diskZeroTrust
+        encryptionAtHost: encryptionAtHost
+        diskEncryptionSetResourceId: encryptionAtHost ? zeroTrust.outputs.ztDiskEncryptionSetResourceId : ''
+        azureDiskEncryption: azureDiskEncryption
+        adeKeyVaultUri: azureDiskEncryption ? zeroTrust.outputs.ztKeyVaultUri : ''
+        adeKeyVaultResourceId: azureDiskEncryption ? zeroTrust.outputs.ztKeyVaultResourceId : ''
+        adeKeyVaultKeyUri: azureDiskEncryption ? zeroTrust.outputs.ztKeyVaultKeyUri : ''
         createAvdFslogixDeployment: createAvdFslogixDeployment
         fslogixSharePath: varFslogixSharePath
         fslogixStorageFqdn: varFslogixStorageFqdn

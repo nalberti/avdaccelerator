@@ -37,9 +37,6 @@ param diskEncryptionKeyExpirationInEpoch int
 @sys.description('Encryption set name')
 param diskEncryptionSetName string
 
-//@sys.description('Zero trust managed identity')
-//param ztManagedIdentityResourceId string
-
 @sys.description('Tags to be applied to resources')
 param tags object
 
@@ -134,7 +131,7 @@ module ztKeyVaultKey '../../../../../carml/1.3.0/Microsoft.KeyVault/vaults/keys/
 }
 
 // Disk Encryption Set for Zero Trust.
-module ztDiskEncryptionSet '../../../../../carml/1.3.0/Microsoft.Compute/diskEncryptionSets/deploy.bicep' = {
+module ztDiskEncryptionSet '../../../../../carml/1.3.0/Microsoft.Compute/diskEncryptionSets/deploy.bicep' = if (!empty(diskEncryptionSetName)) {
     scope: resourceGroup('${subscriptionId}', '${rgName}')
     name: 'ZT-DiskEncryptionSet-${time}'
     params: {
@@ -147,7 +144,6 @@ module ztDiskEncryptionSet '../../../../../carml/1.3.0/Microsoft.Compute/diskEnc
         rotationToLatestKeyVersionEnabled: true
         systemAssignedIdentity: true
         tags: tags
-    //    userAssignedIdentities: {}
     }
 }
 
@@ -155,5 +151,8 @@ module ztDiskEncryptionSet '../../../../../carml/1.3.0/Microsoft.Compute/diskEnc
 // Outputs //
 // =========== //
 
-output ztDiskEncryptionSetResourceId string = ztDiskEncryptionSet.outputs.resourceId
-output ztDiskEncryptionSetPrincipalId string = ztDiskEncryptionSet.outputs.principalId
+output ztDiskEncryptionSetResourceId string = (!empty(diskEncryptionSetName)) ? ztDiskEncryptionSet.outputs.resourceId : ''
+output ztDiskEncryptionSetPrincipalId string = (!empty(diskEncryptionSetName)) ? ztDiskEncryptionSet.outputs.principalId : ''
+output ztKeyVaultUri string = ztKeyVault.outputs.uri
+output ztKeyVaultResourceId string = ztKeyVault.outputs.resourceId
+output ztKeyVaultKeyUri string = ztKeyVaultKey.outputs.uri
